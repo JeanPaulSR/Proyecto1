@@ -13,7 +13,7 @@ public class CostFunction {
 	}
 	
 	public double calculateDistance(Connections connections, City city1, City city2, double max) {
-		double distance = connections.getDistance(city1.getCityNumber(), city2.getCityNumber());
+		double distance = connections.getDistance(city1.getCityNumber()-1, city2.getCityNumber()-1);
 		if(distance == -1.0)
 			distance = max * naturalDistance(connections, city1, city2);
 		return distance;
