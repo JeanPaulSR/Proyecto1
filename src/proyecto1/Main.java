@@ -66,13 +66,14 @@ public class Main {
 	double epsilonp = 2;
 	double percentage = .85;
 	Temperature temp = new Temperature(seed, epsilonp, connections, world);
-	double initialTemperature = temp.inicialTemperature(tsp, 10, percentage, normal);
-
+	//double initialTemperature = temp.inicialTemperature(tsp, 10, percentage, normal);
+	double initialTemperature = 10;
 	double cooling = .05;
 	double l = 1000;
 	double epsilon = 10;
-	Heuristic heuristic = new Heuristic(initialTemperature, cooling, epsilon, l,
-					    world, connections, seed);
+	Heuristic heuristic = new Heuristic(initialTemperature, cooling,
+					    epsilon, l,  world, connections,
+					    seed);
 	int[] result = heuristic.aceptacionPorUmbrales(tsp, normal);
 	String s = "";
 	for(int i = 0; i < result.length; i++){
