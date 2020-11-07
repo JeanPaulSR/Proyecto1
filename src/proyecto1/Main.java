@@ -11,7 +11,9 @@ import java.sql.SQLException;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-	int[] tsp = readPath();
+	int[] tspArray = readPath();
+	Solutions tsp = new Solutions(tspArray);
+	
 
 	Database db = new Database();
 	ResultSet res;
@@ -74,15 +76,9 @@ public class Main {
 	Heuristic heuristic = new Heuristic(initialTemperature, cooling,
 					    epsilon, l,  world, connections,
 					    seed);
-	int[] result = heuristic.aceptacionPorUmbrales(tsp, normal);
-	String s = "";
-	for(int i = 0; i < result.length; i++){
-	    if(i == result.length-1)
-		s += result[i];
-	    else
-		s += result[i] + ", ";
-	}
-	System.out.println("Resulting Solution: " + s);
+	Solutions result = heuristic.aceptacionPorUmbrales(tsp, normal);
+
+	System.out.println("Resulting Solution: " + result.toString());
 		
     }
 	

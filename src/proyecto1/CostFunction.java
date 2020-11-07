@@ -2,18 +2,22 @@ package proyecto1;
 
 public class CostFunction {
 
-    public double funcionDeCosto(int[] permutation, Connections connections, World world, double normal) {
+    public double funcionDeCosto(Solutions permutation, Connections connections,
+				 World world, double normal) {
 	double total = 0.0;
 	double max = connections.findMax(permutation);
-	for(int i = 1; i < permutation.length; i++) {
-	    total += calculateDistance(connections, world.getCity(permutation[i-1]),
-				       world.getCity(permutation[i]), max);
+	for(int i = 1; i < permutation.length(); i++) {
+	    total += calculateDistance(connections,
+				       world.getCity(permutation.get(i-1)),
+				       world.getCity(permutation.get(i)), max);
 	}
 	return total/normal;
     }
 	
-    public double calculateDistance(Connections connections, City city1, City city2, double max) {
-	double distance = connections.getDistance(city1.getCityNumber()-1, city2.getCityNumber()-1);
+    private double calculateDistance(Connections connections, City city1,
+				    City city2, double max) {
+	double distance = connections.getDistance(city1.getCityNumber()-1,
+						  city2.getCityNumber()-1);
 	if(distance <= 0)
 	    return max * naturalDistance(city1, city2);
 	return distance;
@@ -41,8 +45,6 @@ public class CostFunction {
 
 	//sin(latv - latu)/2)^2 + cos(latu) * cos(latv) * sin(lonv - lonu)/2)^2
 	return sin1 + (Math.cos(x1) * Math.cos(x2) * sin2);
-	
-
     }
 	
     private double rad(double g) {
