@@ -5,42 +5,44 @@ import java.util.Random;
 public class Temperature {
     private int seed;
     private double epsilonp;
+    private int n;
     private World world;
     private Connections connections;
 	
     private CostFunction cf = new CostFunction();
 	
     public Temperature(int seed, double epsilonp, Connections connections,
-		       World world) {
+		       World world, int n) {
 	this.seed = seed;
 	this.epsilonp = epsilonp;
+	this.n = n;
 	this.connections = connections;
 	this.world = world;
     }
-    public double inicialTemperature(Solutions solution, double t,
+    public double initialTemperature(Solutions solution, double temperature,
 				     double percentage, double normal) {
-	double p = acceptedPercentage(solution, t, normal);
+	double p = acceptedPercentage(solution, temperature, normal);
+	
 	if(Math.abs(percentage - p) <= epsilonp) 
-	    return t;
-		 
+	    return temperature;     
 			 
 	double t1; double t2;
 	if(p < percentage) {
 	    do {
-		t = t * 2;
-		p = acceptedPercentage(solution, t, normal);
+		temperature = temperature * 2;
+		p = acceptedPercentage(solution, temperature, normal);
+	       
 	    }while(p < percentage);
-	    t1 = t / 2;
-	    t2 = t;
+	    t1 = temperature / 2;
+	    t2 = temperature;
 	}else {
 	    do {
-		t = t / 2;
-		p = acceptedPercentage(solution, t, normal);
+		temperature = temperature / 2;
+		p = acceptedPercentage(solution, temperature, normal);
 	    }while( p > percentage);
-	    t1 = t;
-	    t2 = 2 * t;
+	    t1 = temperature;
+	    t2 = 2 * temperature;
 	}
-		 
 	return binarySearch(solution, t1, t2, percentage, normal);
     }
 
@@ -49,9 +51,11 @@ public class Temperature {
 	double tm = (t1 + t2)/2;
 	if(t2 - t1 < epsilonp)
 	    return tm;
+	
 	double p = acceptedPercentage(solution, tm, normal);
 	if(Math.abs(percentage - p) < epsilonp)
 	    return tm;
+	
 	if(p > percentage)
 	    return binarySearch(solution, t1, tm, percentage,
 				normal);
@@ -59,17 +63,19 @@ public class Temperature {
 	    return binarySearch(solution, tm, t2, percentage, normal);
     }
 
-    private double acceptedPercentage(Solutions solution, double t,
+    private double acceptedPercentage(Solutions solution, double temperature,
 				      double normal) {
 	double c = 0;
-	int n = 1000;
-	Solutions newSolution;
+	
 	for(int i = 0; i < n; i++) {
-	    newSolution = solution.newSolution(seed);
-	    if(cf.funcionDeCosto(newSolution, connections, world, normal) < 
-	       cf.funcionDeCosto(solution, connections, world, normal)) {
+	    Solutions newSolution = solution;
+	    newSolution = newSolution.newSolution();
+	    
+	    if(cf.funcionDeCosto(newSolution, connections, world, normal) <= 
+	       cf.funcionDeCosto(solution, connections, world, normal)
+	       + temperature) {
 		c++;
-		newSolution = solution;
+	        solution = newSolution;
 	    }
 	}
 	return c/n;

@@ -6,6 +6,8 @@ public class CostFunction {
 				 World world, double normal) {
 	double total = 0.0;
 	double max = connections.findMax(permutation);
+
+	//Starting at i = 1 to simulate the formula in the document.
 	for(int i = 1; i < permutation.length(); i++) {
 	    total += calculateDistance(connections,
 				       world.getCity(permutation.get(i-1)),
@@ -16,6 +18,7 @@ public class CostFunction {
 	
     private double calculateDistance(Connections connections, City city1,
 				    City city2, double max) {
+	//Required to subtract by 1 as connections is a matrix array
 	double distance = connections.getDistance(city1.getCityNumber()-1,
 						  city2.getCityNumber()-1);
 	if(distance <= 0)
@@ -23,28 +26,26 @@ public class CostFunction {
 	return distance;
     }
 
-    private double naturalDistance(City city1, City city2) {
+    public double naturalDistance(City city1, City city2) {
 	double r = 6373000.0;
 	double a = a(city1, city2);
 	return r * (2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
     }
 	
     private double a(City city1, City city2) {
-	//x = lat y == lon
-	//u
-	double x1 = rad(city1.getX());
-	double y1 = rad(city1.getY());
+	double latU = rad(city1.getLat());
+	double lonU = rad(city1.getLon());
 	//v
-	double x2 = rad(city2.getX());
-	double y2 = rad(city2.getY());
+	double latV = rad(city2.getLat());
+	double lonV = rad(city2.getLon());
 
 	// sin(latv - latu)/2)^2
-	double sin1 = Math.pow( Math.sin(x2 - x1)/2 , 2);
+	double sin1 = Math.pow(Math.sin( (latV - latU)/2 ), 2);
 	// sin(lonv - lonu)/2)^2
-	double sin2 = Math.pow( Math.sin(y2 - y1)/2 , 2);
+	double sin2 = Math.pow(Math.sin( (lonV - lonU)/2 ), 2);
 
 	//sin(latv - latu)/2)^2 + cos(latu) * cos(latv) * sin(lonv - lonu)/2)^2
-	return sin1 + (Math.cos(x1) * Math.cos(x2) * sin2);
+	return sin1 + (Math.cos(latU) * Math.cos(latV) * sin2);
     }
 	
     private double rad(double g) {

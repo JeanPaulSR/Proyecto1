@@ -10,12 +10,15 @@ public class Normalizer {
 	for(int i = 0; i < elements.length(); i++) {
 			
 	    for(int j = 0; j < elements.length(); j++) {
+		
 		if(j <= i  ||i == j+1 )
 		    continue;
-		if(-1.0 != connections.getDistance(elements.get(i),
-						   elements.get(j))) 
-		    normalize.add(connections.getDistance(elements.get(i),
-							  elements.get(j)));		
+
+		double currentDistance = connections.getDistance
+		    (elements.get(i),elements.get(j));
+		    
+		if(-1.0 != currentDistance) 
+		    normalize.add(currentDistance);		
 	    }	
 	}
 	Collections.sort(normalize, Collections.reverseOrder());

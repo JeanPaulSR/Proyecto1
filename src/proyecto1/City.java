@@ -6,16 +6,16 @@ public class City{
     private String city;
     private String country;
     private int population;
-    private double x;
-    private double y;
+    private double latitude;
+    private double longitude;
 
-    public City(int cityNumber, String city, String country, int population, double x, double y){
+    public City(int cityNumber, String city, String country, int population, double latitude, double longitude){
 	this.cityNumber = cityNumber;
 	this.city = city;
 	this.country = country;
 	this.population = population;
-	this.x = x;
-	this.y = y;
+	this.latitude = latitude;
+	this.longitude = longitude;
     }
 
     public int getCityNumber(){
@@ -34,25 +34,29 @@ public class City{
 	return this.population;
     }
 
-    public double getX(){
-	return this.x;
+    public double getLat(){
+	return this.latitude;
     }
 
-    public double getY(){
-	return this.y;
+    public double getLon(){
+	return this.longitude;
     }
 
-    public void updateCity(int cityNumber, String city, String country, int population, double x, double y){
+    public void updateCity(int cityNumber, String city, String country, int population, double latitude, double longitude){
 	this.cityNumber = cityNumber;
 	this.city = city;
 	this.country = country;
 	this.population = population;
-	this.x = x;
-	this.y = y;
+	this.latitude = latitude;
+	this.longitude = longitude;
     }
 	  
     @Override public String toString() {
-	return Integer.toString(this.cityNumber) + " " + this.city + " " + this.country + " " +
-	    Integer.toString(this.population) + " " + String.valueOf(this.x) + " " + String.valueOf(this.y);
+	return "City Number: " + Integer.toString(this.cityNumber) +
+	    ", City Name: " + this.city +
+	    ", Country Name: " + this.country +
+	    ", City Population: " + Integer.toString(this.population) +
+	    ", Latitude: " + String.valueOf(this.latitude) +
+	    ", Longitude: " + String.valueOf(this.longitude);
     }
 }

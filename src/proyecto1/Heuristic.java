@@ -32,6 +32,7 @@ public class Heuristic {
 	double p = 0;
 	double costResult = cf.funcionDeCosto(solution, connections, world,
 					      normal);
+
 		
 	do {
 	    double q = Double.POSITIVE_INFINITY;
@@ -43,7 +44,7 @@ public class Heuristic {
 		solution = pair.solution;
 				
 		if(cf.funcionDeCosto(solution, connections, world, normal) < 
-		   costResult) {
+		   costResult && solution.esFactible(connections)) {
 		    minimumSolution = solution;
 		    costResult = cf.funcionDeCosto(solution, connections,
 						   world, normal);
@@ -53,7 +54,7 @@ public class Heuristic {
 			
 	    temperature = cooling * temperature;
 	}while(temperature > epsilon);
-		
+	
 	return minimumSolution;
     }
 	
@@ -62,9 +63,13 @@ public class Heuristic {
 	double r = 0.0;
 	double costResult = cf.funcionDeCosto(solution, connections, world,
 					      normal);
-		
-	while (c < l) {
-	    Solutions newSolution = solution.newSolution(seed);
+        double maximumIntents = Math.pow(l, 2);
+	int i = 0;
+	do {
+	    if(i > maximumIntents){
+		break;
+	    }
+	    Solutions newSolution = solution.newSolution();
 	    double newCostResult = cf.funcionDeCosto(newSolution, connections,
 						     world, normal);
 			
@@ -74,9 +79,10 @@ public class Heuristic {
 		c++;
 		r += costResult ;
 	    }
-	}
-	Pair pair = new Pair(solution, r/l);
-	return pair;
+	    i++;
+	}while (c < l);
+	//Pair pair = new Pair(solution, r/l);
+	return new Pair(solution, r/l);//pair;
     }
 
 	

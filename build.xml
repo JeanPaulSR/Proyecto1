@@ -52,7 +52,9 @@
     
     <target name="Main">
         <java classname="proyecto1.Main" failonerror="true" fork="yes">
-            <classpath refid="proyecto1.classpath"/>
+          <classpath refid="proyecto1.classpath"/>
+	  <arg value="${seed}"/>
+	  <arg value="${graphs}"/>
         </java>
     </target>
 

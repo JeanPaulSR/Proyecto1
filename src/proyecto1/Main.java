@@ -7,12 +7,35 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.lang.Object.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        int seed = 0;
+	boolean graphs = false;
+	if(args[0].equals("${seed}")){
+	    System.out.println("No seed, setting seed to 0");
+	}else{
+	    try{
+	    seed = Integer.parseInt(args[0]);
+	    }catch(Exception e){
+		System.out.println("Seed is not an integer.");
+		return;
+	    }	
+	}
+
+	if(!args[1].equals("${graphs}")){
+	    try{
+		if(Integer.parseInt(args[1]) == 1)
+		    graphs = true;
+	    }catch(Exception e){
+		System.out.println("Error reading graph command. Use 1 or 0.");
+	    }	
+	}
+	
 	int[] tspArray = readPath();
-	Solutions tsp = new Solutions(tspArray);
+	Solutions tsp = new Solutions(tspArray,seed);
 	
 
 	Database db = new Database();
@@ -26,8 +49,8 @@ public class Main {
 			      res.getString("Name"),
 			      res.getString("Country"),
 			      res.getInt("Population"),
-			      res.getDouble("Longitude"),
-			      res.getDouble("Latitude"));
+			      res.getDouble("Latitude"),
+			      res.getDouble("Longitude"));
 	    }
 	} catch (ClassNotFoundException e) {
 	    e.printStackTrace();
@@ -39,10 +62,9 @@ public class Main {
 	try {
 	    res = db.displayConnections();
 	    while (res.next()){ 
-		connections.addConnection(res.getInt("id_city_1") - 1,
-					  res.getInt("id_city_2") - 1,
+		connections.addConnection(res.getInt("id_city_1") -1,
+					  res.getInt("id_city_2") -1,
 					  res.getDouble("distance"));
-
 	    }
 			
 	} catch (ClassNotFoundException e) {
@@ -54,31 +76,45 @@ public class Main {
 	Normalizer normalizer = new Normalizer();
 	double normal = normalizer.normalize(tsp, connections);
 
-	//Test funcion de cost
 	CostFunction cf = new CostFunction();
-	String value = String.format("%.9f", cf.funcionDeCosto(tsp, connections, world, normal));
 
-	System.out.println("Normal Result: " + String.format("%.9f",normal));
-	System.out.println("Max Result: " +
-			   String.format("%.9f",connections.findMax(tsp)));
-	System.out.println("Cost Function Result: " + value);
-		
+	double epsilonp = .0001;
+	double percentage = .50;
+	double startingTemp = 10;
+	int n = 1000;
+	Temperature temp = new Temperature(seed, epsilonp, connections, world,
+					   n);
+	
+	double initialTemperature = temp.initialTemperature(tsp, startingTemp,
+							    percentage, normal);
 
-	int seed = 10;
-	double epsilonp = 2;
-	double percentage = .85;
-	Temperature temp = new Temperature(seed, epsilonp, connections, world);
-	//double initialTemperature = temp.inicialTemperature(tsp, 10, percentage, normal);
-	double initialTemperature = 10;
-	double cooling = .05;
-	double l = 1000;
-	double epsilon = 10;
+	System.out.printf("Temperature: %.6f \n", initialTemperature);
+	
+	double cooling = .8;
+	//Valor recomendado para es menos que todas las posibles combinaciones
+	double l = Math.pow(tsp.length(),2)/2;
+	
+	//Recommended value for epsilon is .001
+	double epsilon = .001;
 	Heuristic heuristic = new Heuristic(initialTemperature, cooling,
 					    epsilon, l,  world, connections,
 					    seed);
+
+	System.out.println("Finding Solution...");
 	Solutions result = heuristic.aceptacionPorUmbrales(tsp, normal);
 
-	System.out.println("Resulting Solution: " + result.toString());
+	if(result.esFactible(connections))
+	   System.out.println("Solution exists in database");
+	if(result == null)
+	    System.out.println("No valid result found");
+	else
+	    System.out.println("Resulting Solution: "+ result.toString());
+	System.out.println("Cost Function Result: " +
+			   (cf.funcionDeCosto(result,connections, world,
+					      normal)));
+		System.out.println("Percentage of the normal: " +
+			   (cf.funcionDeCosto(result,connections, world,
+					      normal)/normal));
 		
     }
 	
