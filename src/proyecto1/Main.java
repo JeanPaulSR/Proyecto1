@@ -18,7 +18,7 @@ public class Main {
 	    System.out.println("No seed, setting seed to 0");
 	}else{
 	    try{
-	    seed = Integer.parseInt(args[0]);
+		seed = Integer.parseInt(args[0]);
 	    }catch(Exception e){
 		System.out.println("Seed is not an integer.");
 		return;
@@ -35,7 +35,6 @@ public class Main {
 	}
 	
 	int[] tspArray = readPath();
-	Solutions tsp = new Solutions(tspArray,seed);
 	
 
 	Database db = new Database();
@@ -72,10 +71,21 @@ public class Main {
 	} catch (SQLException e) {
 	    e.printStackTrace();
 	}
-		
+
+	/*
+	  Solutions[] best5 = {null, null, null, null, null};
+	  for(int i = 0; i < 50; i++){
+	  seed = i;
+	  System.out.println(i);
+	*/
+	
+	Solutions tsp = new Solutions(tspArray, seed, connections, world);
+	    
 	Normalizer normalizer = new Normalizer();
 	double normal = normalizer.normalize(tsp, connections);
 
+	tsp.setNormal(normal);
+	
 	CostFunction cf = new CostFunction();
 
 	double epsilonp = .0001;
@@ -90,31 +100,60 @@ public class Main {
 
 	System.out.printf("Temperature: %.6f \n", initialTemperature);
 	
-	double cooling = .8;
+	double cooling = .95;
 	//Valor recomendado para es menos que todas las posibles combinaciones
 	double l = Math.pow(tsp.length(),2)/2;
 	
 	//Recommended value for epsilon is .001
 	double epsilon = .001;
 	Heuristic heuristic = new Heuristic(initialTemperature, cooling,
-					    epsilon, l,  world, connections,
-					    seed);
+					    epsilon, l,  world,
+					    connections);
 
 	System.out.println("Finding Solution...");
+	
 	Solutions result = heuristic.aceptacionPorUmbrales(tsp, normal);
 
-	if(result.esFactible(connections))
-	   System.out.println("Solution exists in database");
+	/*
+	  for(int j = 0; j < 5; j++){
+	  if(result != null){
+	  if(best5[j] == null){
+	  best5[j] = result;
+	  break;
+	  }
+	  else{
+	  if(result.getCostFunction() < best5[j].getCostFunction()){
+	  for(int k = 4; j < k; k--)
+	  best5[k] = best5[k-1];
+			   
+	  best5[j] = result;
+	  break;
+	  }
+	  }
+	  }
+	  }
+	  }
+	    
+	  for(int i = 0; i < 5; i++){
+	  Solutions result = best5[i];
+	  if(result != null){
+	  System.out.println("Resulting Solution: "+ result.toString());
+	  System.out.println("Cost Function Result: " +
+	  (result.getCostFunction()));
+	  System.out.println(result.getSeed());
+	  }
+	  }
+	*/
+
 	if(result == null)
 	    System.out.println("No valid result found");
-	else
+	else{
 	    System.out.println("Resulting Solution: "+ result.toString());
-	System.out.println("Cost Function Result: " +
-			   (cf.funcionDeCosto(result,connections, world,
-					      normal)));
-		System.out.println("Percentage of the normal: " +
-			   (cf.funcionDeCosto(result,connections, world,
-					      normal)/normal));
+	    if(result.esFactible(connections))
+		System.out.println("Solution exists in database");
+	    System.out.println("Cost Function Result: " +
+			       (result.getCostFunction()));
+	}
 		
     }
 	

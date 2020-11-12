@@ -5,13 +5,24 @@ import java.util.Random;
 public class Solutions{
     private int[] solution;
     private int seed;
+    private double costFunction;
+    private Connections connections;
+    private double normal;
+    private World world;
+
+    
+    private CostFunction cf = new CostFunction();
     
     Random rd; 
     
-    public Solutions(int[] solution,int seed){
+    public Solutions(int[] solution,int seed, Connections connections,
+		     World world){
 	this.solution = solution;
 	this.seed = seed;
 	rd = new Random(seed);
+	this.connections = connections;
+	this.world = world;
+	this.costFunction = -1;
     }
 
     public int length(){
@@ -25,25 +36,114 @@ public class Solutions{
     public void set(int i, int j){
 	this.solution[i] = j;
     }
-    
-    public Solutions newSolution() {
-	Solutions auxSolution = new Solutions(solution,seed);
+
+    public int getSeed(){
+	return this.seed;
+    }
+
+    public Solutions clone(){
+	Solutions auxSolution = new Solutions(solution,seed, connections,world);
 	int[] deepCopy = new int[solution.length];
 	for(int i = 0; i < solution.length; i++)
 	    deepCopy[i] = solution[i];
 	
 	auxSolution.solution = deepCopy;
+	auxSolution.setNormal(normal);
+	return auxSolution;
+    }
+    public Solutions newSolution() {
+	//Creating deep copy of solution
+	Solutions auxSolution = new Solutions(solution,seed, connections,world);
+	int[] deepCopy = new int[solution.length];
+	for(int i = 0; i < solution.length; i++)
+	    deepCopy[i] = solution[i];
+	
+	auxSolution.solution = deepCopy;
+	auxSolution.setNormal(normal);
+
+	double max = connections.findMax(this);
+
+	//Finding suitiable positions to interchange
 	int s = rd.nextInt(auxSolution.length());
 	int t = s;
 	while(s == t)
 	    t = rd.nextInt(auxSolution.length());
+
+	//Multiplying by normal
+	double total = auxSolution.costFunction * normal;
+
+	//Deleting edges that connect to the current cities to interchange
+	//Additionally taking into account cities that are next to each other
+	if(s != 0)
+	    auxSolution.costFunction = auxSolution.costFunction -
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(s-1)),
+				     world.getCity(auxSolution.get(s)),
+				     max);
+
+	if(s != auxSolution.length()-1)
+	    auxSolution.costFunction = auxSolution.costFunction -
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(s)),
+				     world.getCity(auxSolution.get(s+1)),
+				      max);
+
+	if(t != 0 && t-1 != s)
+	    auxSolution.costFunction = auxSolution.costFunction -
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(t-1)),
+				     world.getCity(auxSolution.get(t)),
+				      max);
+
+	if(t != auxSolution.length()-1 && t+1 != s)
+	    auxSolution.costFunction = auxSolution.costFunction -
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(t)),
+				     world.getCity(auxSolution.get(t+1)),
+				      max);
+
+	
+	//Interchanging positions
 	int aux = auxSolution.get(s);
 	int aux2 = auxSolution.get(t);
 	auxSolution.set(s, aux2);
         auxSolution.set(t, aux);
-	
 	auxSolution.rd = rd;
+
+	//Adding new edges that have been formed
+	if(s != 0)
+	    auxSolution.costFunction = auxSolution.costFunction +
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(s-1)),
+				     world.getCity(auxSolution.get(s)),
+				      max);
 	
+
+	if(s != auxSolution.length()-1)
+	    auxSolution.costFunction = auxSolution.costFunction +
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(s)),
+				     world.getCity(auxSolution.get(s+1)),
+				      max);
+
+	if(t != 0 && t-1 != s)
+	    auxSolution.costFunction = auxSolution.costFunction +
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(t-1)),
+				     world.getCity(auxSolution.get(t)),
+				      max);
+
+	if(t != auxSolution.length()-1 && t+1 != s)
+	    auxSolution.costFunction = auxSolution.costFunction +
+		cf.calculateDistance(connections,
+				     world.getCity(auxSolution.get(t)),
+				     world.getCity(auxSolution.get(t+1)),
+				      max);
+
+	//Dividing by the normal
+	auxSolution.costFunction = total/normal;
+
+	//Returning solution
 	return auxSolution;
     }
     
@@ -80,6 +180,22 @@ public class Solutions{
 	return false;
     }
 
+    private void calculateCostFunction(Connections connections, World world,
+				       double normal){
+	this.costFunction = cf.funcionDeCosto(this, connections, world,
+					      normal);
+    }
+
+    public void setNormal(double normal){
+	this.normal = normal;
+    }
+
+    public double getCostFunction(){
+	if(this.costFunction == -1)
+	    calculateCostFunction(connections, world, normal);
+	return this.costFunction;
+    }
+    
     @Override
     public String toString(){
 	String s = "";

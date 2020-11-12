@@ -8,8 +8,7 @@ public class Temperature {
     private int n;
     private World world;
     private Connections connections;
-	
-    private CostFunction cf = new CostFunction();
+        
 	
     public Temperature(int seed, double epsilonp, Connections connections,
 		       World world, int n) {
@@ -71,8 +70,7 @@ public class Temperature {
 	    Solutions newSolution = solution;
 	    newSolution = newSolution.newSolution();
 	    
-	    if(cf.funcionDeCosto(newSolution, connections, world, normal) <= 
-	       cf.funcionDeCosto(solution, connections, world, normal)
+	    if(newSolution.getCostFunction() <= solution.getCostFunction()
 	       + temperature) {
 		c++;
 	        solution = newSolution;

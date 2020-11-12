@@ -11,27 +11,23 @@ public class Heuristic {
     private Solutions minimumSolution;
     private World world;
     private Connections connections;
-	
-    private int seed;
 
     private CostFunction cf = new CostFunction();
 	
     public Heuristic (double temperature, double cooling, double epsilon,
-		      double l, World world, Connections connections, int seed){
+		      double l, World world, Connections connections){
 	this.temperature = temperature;
 	this.cooling = cooling;
 	this.epsilon = epsilon;
 	this.l = l;
 	this.world = world;
 	this.connections = connections;
-	this.seed = seed;
 		
     }
 	
     public Solutions aceptacionPorUmbrales(Solutions solution, double normal) {
 	double p = 0;
-	double costResult = cf.funcionDeCosto(solution, connections, world,
-					      normal);
+	double costResult = solution.getCostFunction();
 
 		
 	do {
@@ -41,17 +37,17 @@ public class Heuristic {
 		q = p;
 		Pair pair = calculateLot(solution, normal);
 		p = pair.p;
+	        
 		solution = pair.solution;
 				
-		if(cf.funcionDeCosto(solution, connections, world, normal) < 
+		if(solution.getCostFunction() < 
 		   costResult && solution.esFactible(connections)) {
 		    minimumSolution = solution;
-		    costResult = cf.funcionDeCosto(solution, connections,
-						   world, normal);
+		    costResult = solution.getCostFunction();
 					
 		}
-	    }while(p <= q);
-			
+	    }while(p <= q && p > 0);
+
 	    temperature = cooling * temperature;
 	}while(temperature > epsilon);
 	
@@ -61,18 +57,18 @@ public class Heuristic {
     public Pair calculateLot(Solutions solution, double normal) {
 	int c = 0;
 	double r = 0.0;
-	double costResult = cf.funcionDeCosto(solution, connections, world,
-					      normal);
-        double maximumIntents = Math.pow(l, 2);
+	double costResult = solution.getCostFunction();
+        double maximumIntents = solution.length() * (solution.length()*.5);
 	int i = 0;
+	boolean escaped = false;
 	do {
 	    if(i > maximumIntents){
+		
+		escaped = true;
 		break;
 	    }
 	    Solutions newSolution = solution.newSolution();
-	    double newCostResult = cf.funcionDeCosto(newSolution, connections,
-						     world, normal);
-			
+	    double newCostResult = newSolution.getCostFunction();
 	    if(newCostResult < costResult + temperature) {
 		solution = newSolution;
 		costResult = newCostResult;
@@ -81,8 +77,10 @@ public class Heuristic {
 	    }
 	    i++;
 	}while (c < l);
-	//Pair pair = new Pair(solution, r/l);
-	return new Pair(solution, r/l);//pair;
+	
+	if(escaped)
+	    return new Pair(solution, r/maximumIntents);
+	return new Pair(solution, r/l);
     }
 
 	

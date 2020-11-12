@@ -16,7 +16,7 @@ public class CostFunction {
 	return total/normal;
     }
 	
-    private double calculateDistance(Connections connections, City city1,
+    public double calculateDistance(Connections connections, City city1,
 				    City city2, double max) {
 	//Required to subtract by 1 as connections is a matrix array
 	double distance = connections.getDistance(city1.getCityNumber()-1,
