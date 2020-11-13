@@ -163,8 +163,8 @@ public class Main {
 	    //Settings for the value of the heuristic calculation
 	    double cooling = .95;
 	    //l is preferable set to length()^/2, set low due to time constraint
-	    //double l = tsp.length() * tsp.length() * .2;
-	    double l = tsp.length() * (tsp.length() * .5);
+	    double l = tsp.length() * tsp.length()-1 * .2;
+	    //double l = tsp.length() * (tsp.length()-1 * .5);
 	    double epsilon = .001;
 	    Heuristic heuristic = new Heuristic(initialTemperature, cooling,
 						epsilon, l,  world,

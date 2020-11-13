@@ -57,8 +57,8 @@ public class Heuristic {
 	int c = 0;
 	double r = 0.0;
 	double costResult = solution.getCostFunction();
-        //double maximumIntents = Math.pow(solution.length(),2)/2;
-	double maximumIntents = l * 10;
+        double maximumIntents = Math.pow(solution.length(),2)/2;
+	//double maximumIntents = l * 10;
 	int i = 0;
 	boolean escaped = false;
 	do {
