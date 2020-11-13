@@ -54,7 +54,10 @@
         <java classname="proyecto1.Main" failonerror="true" fork="yes">
           <classpath refid="proyecto1.classpath"/>
 	  <arg value="${seed}"/>
-	  <arg value="${graphs}"/>
+	  <arg value="${gen}"/>
+	  <arg value="${path}"/>
+	  <arg value="${perm}"/>
+	  <arg value="${out}"/>
         </java>
     </target>
 

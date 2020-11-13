@@ -40,8 +40,7 @@ public class Heuristic {
 	        
 		solution = pair.solution;
 				
-		if(solution.getCostFunction() < 
-		   costResult && solution.esFactible(connections)) {
+		if(solution.getCostFunction() < costResult) {
 		    minimumSolution = solution;
 		    costResult = solution.getCostFunction();
 					
@@ -58,12 +57,12 @@ public class Heuristic {
 	int c = 0;
 	double r = 0.0;
 	double costResult = solution.getCostFunction();
-        double maximumIntents = solution.length() * (solution.length()*.5);
+        //double maximumIntents = Math.pow(solution.length(),2)/2;
+	double maximumIntents = l * 10;
 	int i = 0;
 	boolean escaped = false;
 	do {
 	    if(i > maximumIntents){
-		
 		escaped = true;
 		break;
 	    }
@@ -77,9 +76,8 @@ public class Heuristic {
 	    }
 	    i++;
 	}while (c < l);
-	
-	if(escaped)
-	    return new Pair(solution, r/maximumIntents);
+        if(escaped)
+	    return new Pair(solution, r/c);
 	return new Pair(solution, r/l);
     }
 
